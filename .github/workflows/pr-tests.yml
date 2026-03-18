@@ -1,35 +1,20 @@
 name: PR Tests
 
-on:
-  pull_request:
-    branches:
-      - main
-      - master
+on: [pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Clonar el repositorio
-      [cite_start]uses: actions/checkout@v4 [cite: 419]
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
 
-    - name: Construir y levantar contenedores de Docker
-      env:
-        POSTGRES_DB: postgres
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_HOST: db
-        POSTGRES_PORT: 5432
-        DJANGO_SECRET_KEY: test_secret_key
-        DJANGO_DEBUG: "True"
-        DJANGO_ALLOWED_HOSTS: "*"
-      run: |
-        docker compose build
-        docker compose up -d
-        sleep 20
+      - name: Levantar Docker
+        run: |
+          docker compose up -d --build
+          sleep 20
 
-    - name: Ejecutar tests y comprobar cobertura (>80%)
-      run: |
-        docker compose exec -T web coverage run manage.py test [cite: 82, 456]
-        docker compose exec -T web coverage report --fail-under=80 [cite: 89, 456]
+      - name: Tests y Cobertura
+        run: |
+          docker compose exec -T web coverage run manage.py test
+          docker compose exec -T web coverage report --fail-under=80
