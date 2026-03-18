@@ -9,21 +9,18 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
 
-    - name: Construir y levantar contenedores
+    - name: Construir y levantar contenedores de Docker
       run: |
-        docker-compose build
-        docker-compose up -d
-        # Pausa de 10 segundos para darle tiempo a PostgreSQL a arrancar del todo
-        sleep 10
+        docker compose build
+        docker compose up -d
+        sleep 15
 
-    - name: Aplicar migraciones
-      run: docker-compose exec -T web python manage.py migrate
-
-    - name: Ejecutar tests y comprobar cobertura
+    - name: Ejecutar tests y comprobar cobertura (>80%)
       run: |
-        docker-compose exec -T web coverage run manage.py test
-        docker-compose exec -T web coverage report --fail-under=80
+        docker compose exec -T web coverage run manage.py test
+        docker compose exec -T web coverage report --fail-under=80
