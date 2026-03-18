@@ -13,15 +13,17 @@ jobs:
     - name: Clonar el repositorio
       uses: actions/checkout@v4
 
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+    - name: Construir y levantar contenedores
+      run: |
+        docker-compose build
+        docker-compose up -d
+        # Pausa de 10 segundos para darle tiempo a PostgreSQL a arrancar del todo
+        sleep 10
 
-    - name: Instalar dependencias
-      run: pip install -r requirements.txt
+    - name: Aplicar migraciones
+      run: docker-compose exec -T web python manage.py migrate
 
     - name: Ejecutar tests y comprobar cobertura
       run: |
-        coverage run manage.py test
-        coverage report --fail-under=80
+        docker-compose exec -T web coverage run manage.py test
+        docker-compose exec -T web coverage report --fail-under=80
