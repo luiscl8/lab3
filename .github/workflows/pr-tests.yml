@@ -7,14 +7,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
-        uses: actions/checkout@v4
+        [cite_start]uses: actions/checkout@v4 [cite: 419]
+
+      - name: Crear archivo .env de prueba
+        run: |
+          echo "POSTGRES_DB=postgres" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=postgres" >> .env
+          echo "POSTGRES_HOST=db" >> .env
+          echo "POSTGRES_PORT=5432" >> .env
+          echo "DJANGO_SECRET_KEY=test_secret_key" >> .env
+          echo "DJANGO_DEBUG=True" >> .env
+          echo "DJANGO_ALLOWED_HOSTS=*" >> .env
 
       - name: Levantar Docker
         run: |
-          docker compose up -d --build
-          sleep 20
+          docker compose up -d --build [cite: 365]
+          sleep 30
 
       - name: Tests y Cobertura
         run: |
-          docker compose exec -T web coverage run manage.py test
-          docker compose exec -T web coverage report --fail-under=80
+          docker compose exec -T web coverage run manage.py test [cite: 75, 89]
+          docker compose exec -T web coverage report --fail-under=80 [cite: 89, 456]
